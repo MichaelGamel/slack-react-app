@@ -13,7 +13,10 @@ class Messages extends Component {
     messages: [],
     messagesLoading: true,
     progressBar: false,
-    numberUniqueUsers: ''
+    numberUniqueUsers: '',
+    searchTerm: '',
+    searchLoading: false,
+    searchResults: []
   };
 
   componentDidMount() {
@@ -37,6 +40,30 @@ class Messages extends Component {
       });
       this.countUniqueUsers(loadedMessages);
     });
+  };
+
+  handleSearchChange = event => {
+    this.setState({ searchTerm: event.target.value, searchLoading: true }, () =>
+      this.handleSearchMessages()
+    );
+  };
+
+  handleSearchMessages = () => {
+    const channelMessages = [...this.state.messages];
+    const regex = new RegExp(this.state.searchTerm, 'gi');
+    const searchResults = channelMessages.reduce((acc, message) => {
+      if (
+        (message.content && message.content.match(regex)) ||
+        message.user.name.match(regex)
+      ) {
+        acc.push(message);
+      }
+      return acc;
+    }, []);
+    this.setState({ searchResults });
+    setTimeout(() => {
+      this.setState({ searchLoading: false });
+    }, 1000);
   };
 
   countUniqueUsers = messages => {
@@ -78,19 +105,26 @@ class Messages extends Component {
       user,
       messages,
       progressBar,
-      numberUniqueUsers
+      numberUniqueUsers,
+      searchTerm,
+      searchResults,
+      searchLoading
     } = this.state;
     return (
       <React.Fragment>
         <MessagesHeader
+          handleSearchChange={this.handleSearchChange}
           numberUniqueUsers={numberUniqueUsers}
           channelName={this.displayChannelName(channel)}
+          searchLoading={searchLoading}
         />
         <Segment>
           <Comment.Group
             className={progressBar ? 'message__progress' : 'messages'}
           >
-            {this.displayMessages(messages)}
+            {searchTerm
+              ? this.displayMessages(searchResults)
+              : this.displayMessages(messages)}
           </Comment.Group>
         </Segment>
         <MessageForm
