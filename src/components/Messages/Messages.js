@@ -7,7 +7,9 @@ import Message from './Message';
 
 class Messages extends Component {
   state = {
+    privateChannel: this.props.isPrivateChannel,
     messagesRef: firebase.database().ref('messages'),
+    privateMessagesRef: firebase.database().ref('privateMessages'),
     channel: this.props.currentChannel,
     user: this.props.currentUser,
     messages: [],
@@ -32,7 +34,8 @@ class Messages extends Component {
 
   addListeners = channelId => {
     let loadedMessages = [];
-    this.state.messagesRef.child(channelId).on('child_added', snap => {
+    const ref = this.getMessagesRef();
+    ref.child(channelId).on('child_added', snap => {
       loadedMessages.push(snap.val());
       this.setState({
         messages: loadedMessages,
@@ -88,6 +91,11 @@ class Messages extends Component {
       />
     ));
 
+  getMessagesRef = () => {
+    const { privateChannel, messagesRef, privateMessagesRef } = this.state;
+    return privateChannel ? privateMessagesRef : messagesRef;
+  };
+
   isProgressBarVisible = percent => {
     if (percent > 0) {
       this.setState({ progressBar: true });
@@ -96,7 +104,11 @@ class Messages extends Component {
     }
   };
 
-  displayChannelName = channel => (channel ? `#${channel.name}` : '');
+  displayChannelName = channel => {
+    return channel
+      ? `${this.state.privateChannel ? `@` : `#`}${channel.name}`
+      : '';
+  };
 
   render() {
     const {
@@ -108,7 +120,8 @@ class Messages extends Component {
       numberUniqueUsers,
       searchTerm,
       searchResults,
-      searchLoading
+      searchLoading,
+      privateChannel
     } = this.state;
     return (
       <React.Fragment>
@@ -117,6 +130,7 @@ class Messages extends Component {
           numberUniqueUsers={numberUniqueUsers}
           channelName={this.displayChannelName(channel)}
           searchLoading={searchLoading}
+          isPrivateChannel={privateChannel}
         />
         <Segment>
           <Comment.Group
@@ -132,6 +146,8 @@ class Messages extends Component {
           currentChannel={channel}
           currentUser={user}
           isProgressBarVisible={this.isProgressBarVisible}
+          isPrivateChannel={privateChannel}
+          getMessagesRef={this.getMessagesRef}
         />
       </React.Fragment>
     );
