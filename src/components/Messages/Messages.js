@@ -32,6 +32,18 @@ class Messages extends Component {
     this.state.messagesRef.off();
   }
 
+  componentDidUpdate(privateProps, privateState) {
+    setTimeout(() => {
+      if (this.messagesEnd) {
+        this.scrollToBottom();
+      }
+    }, 1000);
+  }
+
+  scrollToBottom = () => {
+    this.messagesEnd.scrollIntoView({ behavior: 'smooth' });
+  };
+
   addListeners = channelId => {
     let loadedMessages = [];
     const ref = this.getMessagesRef();
@@ -139,6 +151,7 @@ class Messages extends Component {
             {searchTerm
               ? this.displayMessages(searchResults)
               : this.displayMessages(messages)}
+            <div ref={node => (this.messagesEnd = node)} />
           </Comment.Group>
         </Segment>
         <MessageForm
