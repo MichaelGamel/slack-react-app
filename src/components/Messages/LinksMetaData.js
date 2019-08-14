@@ -32,7 +32,7 @@ const displayTitle = data => {
       {data.title}
     </span>
   ) : (
-    data.title
+    <div className="metadata__title"> {data.title} </div>
   );
 };
 
