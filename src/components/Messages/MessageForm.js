@@ -159,6 +159,12 @@ class MessageForm extends Component {
     }
   };
 
+  handleKeyDown = (event) => {
+    if (event.ctrlKey && event.keyCode === 13) {
+      this.sendMessage();
+    }
+  }
+
   render() {
     const {
       errors,
@@ -174,6 +180,7 @@ class MessageForm extends Component {
           fluid
           name="message"
           onChange={this.handleChange}
+          onKeyDown={this.handleKeyDown}
           style={{ marginBottom: '0.7em' }}
           label={<Button icon={'add'} />}
           labelPosition="left"
