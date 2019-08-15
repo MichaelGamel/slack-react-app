@@ -6,6 +6,7 @@ import FileModal from './FileModal';
 import ProgressBar from './ProgressBar';
 import { Picker, emojiIndex } from 'emoji-mart';
 import 'emoji-mart/css/emoji-mart.css';
+import anchorme from "anchorme";
 
 class MessageForm extends Component {
   state = {
@@ -43,7 +44,7 @@ class MessageForm extends Component {
     if (fileUrl !== null) {
       message['image'] = fileUrl;
     } else {
-      message['content'] = this.state.message;
+      message['content'] = anchorme(this.state.message);
     }
 
     return message;

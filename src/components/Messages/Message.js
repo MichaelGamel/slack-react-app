@@ -25,7 +25,7 @@ const Message = ({ user, message }) => (
         <Image src={message.image} className="message__image" />
       ) : (
         <React.Fragment>
-          <Comment.Text>{message.content}</Comment.Text>
+          <Comment.Text dangerouslySetInnerHTML={{ __html: message.content }} />
           {hasMetadata(message) && (
             <LinksMetaData metadata={message.metadata} />
           )}
