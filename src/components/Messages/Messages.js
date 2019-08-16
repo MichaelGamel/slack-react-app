@@ -4,6 +4,7 @@ import MessagesHeader from './MessagesHeader';
 import MessageForm from './MessageForm';
 import firebase from '../../firebase';
 import Message from './Message';
+import Skeleton from './Skeleton';
 
 class Messages extends Component {
   state = {
@@ -122,6 +123,15 @@ class Messages extends Component {
       : '';
   };
 
+  displayMessageSkeleton = loading =>
+    loading ? (
+      <React.Fragment>
+        {[...Array(15)].map((_, i) => (
+          <Skeleton key={i} />
+        ))}
+      </React.Fragment>
+    ) : null;
+
   render() {
     const {
       messagesRef,
@@ -133,7 +143,8 @@ class Messages extends Component {
       searchTerm,
       searchResults,
       searchLoading,
-      privateChannel
+      privateChannel,
+      messagesLoading
     } = this.state;
     return (
       <React.Fragment>
@@ -148,6 +159,7 @@ class Messages extends Component {
           <Comment.Group
             className={progressBar ? 'message__progress' : 'messages'}
           >
+            {this.displayMessageSkeleton(messagesLoading)}
             {searchTerm
               ? this.displayMessages(searchResults)
               : this.displayMessages(messages)}
