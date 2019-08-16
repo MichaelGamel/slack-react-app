@@ -6,7 +6,7 @@ import FileModal from './FileModal';
 import ProgressBar from './ProgressBar';
 import { Picker, emojiIndex } from 'emoji-mart';
 import 'emoji-mart/css/emoji-mart.css';
-import anchorme from "anchorme";
+import anchorme from 'anchorme';
 
 class MessageForm extends Component {
   state = {
@@ -130,18 +130,24 @@ class MessageForm extends Component {
       try {
         const messageObj = this.createMessage();
 
-        const res = await fetch(
-          process.env.REACT_APP_SCRAPE_METATAGS_FUNCTION_URL,
-          {
-            method: 'POST',
-            body: JSON.stringify({ text: message })
+        const linksCount = anchorme(message, {
+          list: true
+        });
+
+        if (linksCount.length > 0) {
+          const res = await fetch(
+            process.env.REACT_APP_SCRAPE_METATAGS_FUNCTION_URL,
+            {
+              method: 'POST',
+              body: JSON.stringify({ text: message })
+            }
+          );
+
+          const data = await res.json();
+
+          if (data.length > 0) {
+            messageObj['metadata'] = data;
           }
-        );
-
-        const data = await res.json();
-
-        if (data.length > 0) {
-          messageObj['metadata'] = data;
         }
 
         await getMessagesRef()
