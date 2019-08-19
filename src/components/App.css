@@ -69,6 +69,23 @@ body,
   margin-bottom: 5px;
 }
 
+.metadata__close {
+  position: absolute;
+  left: 28px;
+  margin-top: 5px !important;
+  color: #bdbdbd;
+  cursor: pointer;
+  display: none !important;
+}
+
+.metadata__close:hover {
+  color: #727272;
+}
+
+.message:hover .metadata__close {
+  display: block !important;
+}
+
 
 /* Skeleton.js */
 .skeleton {

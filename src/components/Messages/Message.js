@@ -3,8 +3,8 @@ import { Comment, Image } from 'semantic-ui-react';
 import moment from 'moment';
 import LinksMetaData from './LinksMetaData';
 
-const isOwnMessage = (message, user) => {
-  return message.user.id === user.uid ? 'message__self' : '';
+const isOwnMessage = (message, user, className) => {
+  return message.user.id === user.uid ? className : '';
 };
 
 const timeFromNow = timestamp => moment(timestamp).fromNow();
@@ -15,10 +15,10 @@ const isImage = message =>
 const hasMetadata = message =>
   message.hasOwnProperty('metadata') && message.metadata.length > 0;
 
-const Message = ({ user, message }) => (
-  <Comment>
+const Message = ({ user, message, removeMetaData }) => (
+  <Comment className={isOwnMessage(message, user, 'message')}>
     <Comment.Avatar src={message.user.avatar} />
-    <Comment.Content className={isOwnMessage(message, user)}>
+    <Comment.Content className={isOwnMessage(message, user, 'message__self')}>
       <Comment.Author as="a">{message.user.name}</Comment.Author>
       <Comment.Metadata>{timeFromNow(message.timestamp)}</Comment.Metadata>
       {isImage(message) ? (
@@ -27,7 +27,7 @@ const Message = ({ user, message }) => (
         <React.Fragment>
           <Comment.Text dangerouslySetInnerHTML={{ __html: message.content }} />
           {hasMetadata(message) && (
-            <LinksMetaData metadata={message.metadata} />
+            <LinksMetaData removeMetaData={(data) => removeMetaData(message, data)} metadata={message.metadata} />
           )}
         </React.Fragment>
       )}

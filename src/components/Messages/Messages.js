@@ -48,8 +48,13 @@ class Messages extends Component {
   addListeners = channelId => {
     let loadedMessages = [];
     const ref = this.getMessagesRef();
-    ref.child(channelId).on('child_added', snap => {
-      loadedMessages.push(snap.val());
+    let data;
+    ref.child(channelId).on('value', snap => {
+      data = snap.val();
+      loadedMessages = [];
+      for (const key in data) {
+        loadedMessages.push(data[key]);
+      }
       this.setState({
         messages: loadedMessages,
         messagesLoading: false
@@ -82,6 +87,19 @@ class Messages extends Component {
     }, 1000);
   };
 
+  handleRemoveLinkMetadata = async (message, data) => {
+
+    const { channel } = this.state;
+    const newMessage = {...message};
+    if (newMessage.metadata.length > 1) {
+      newMessage.metadata.splice(newMessage.metadata.findIndex(meta => meta.url === data.url), 1);
+    } else {
+      delete newMessage.metadata;
+    }
+    const ref = this.getMessagesRef();
+    await ref.child(channel.id).child(message.id).set(newMessage);
+  };
+
   countUniqueUsers = messages => {
     const uniqueUsers = messages.reduce((acc, message) => {
       if (!acc.includes(message.user.name)) {
@@ -101,6 +119,7 @@ class Messages extends Component {
         key={message.timestamp}
         message={message}
         user={this.state.user}
+        removeMetaData={this.handleRemoveLinkMetadata}
       />
     ));
 

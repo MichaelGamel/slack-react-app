@@ -32,7 +32,11 @@ class MessageForm extends Component {
   };
 
   createMessage = (fileUrl = null) => {
+    const ref = this.props.getMessagesRef();
+    const key = ref.child(this.state.channel.id).push().key
+    
     const message = {
+      id: key,
       timestamp: firebase.database.ServerValue.TIMESTAMP,
       user: {
         id: this.state.user.uid,
@@ -106,10 +110,12 @@ class MessageForm extends Component {
 
   sendFileMessage = async (fileUrl, ref, pathToUpload) => {
     try {
+      const messageObj = this.createMessage(fileUrl);
+
       await ref
-        .child(pathToUpload)
-        .push()
-        .set(this.createMessage(fileUrl));
+      .child(pathToUpload)
+      .child(messageObj.id)
+      .update(messageObj);
 
       this.setState({ uploadState: 'done' });
       this.props.isProgressBarVisible(0);
@@ -152,8 +158,8 @@ class MessageForm extends Component {
 
         await getMessagesRef()
           .child(channel.id)
-          .push()
-          .set(messageObj);
+          .child(messageObj.id)
+          .update(messageObj);
 
         this.setState({ loading: false, message: '', errors: [] });
       } catch (error) {

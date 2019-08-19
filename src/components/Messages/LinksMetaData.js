@@ -36,11 +36,11 @@ const displayTitle = data => {
   );
 };
 
-const LinksMetaData = ({ metadata }) => (
-  <React.Fragment>
-    {metadata.map(data => (
+const LinksMetaData = ({ metadata, removeMetaData }) =>
+  metadata.map(data => (
+    <React.Fragment key={data.title}>
+      <Icon name="close" size="small" className="metadata__close" onClick={() => removeMetaData(data)} />
       <Card
-        key={data.title}
         image={data.image}
         header={displayTitle(data)}
         meta={data.url}
@@ -48,8 +48,7 @@ const LinksMetaData = ({ metadata }) => (
         extra={extra(data.url)}
         style={{ marginBottom: '1em' }}
       />
-    ))}
-  </React.Fragment>
-);
+    </React.Fragment>
+  ));
 
 export default LinksMetaData;
