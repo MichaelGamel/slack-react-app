@@ -11,6 +11,7 @@ import anchorme from 'anchorme';
 class MessageForm extends Component {
   state = {
     storageRef: firebase.storage().ref(),
+    typingRef: firebase.database().ref('typing'),
     message: '',
     channel: this.props.currentChannel,
     user: this.props.currentUser,
@@ -33,8 +34,8 @@ class MessageForm extends Component {
 
   createMessage = (fileUrl = null) => {
     const ref = this.props.getMessagesRef();
-    const key = ref.child(this.state.channel.id).push().key
-    
+    const key = ref.child(this.state.channel.id).push().key;
+
     const message = {
       id: key,
       timestamp: firebase.database.ServerValue.TIMESTAMP,
@@ -113,9 +114,9 @@ class MessageForm extends Component {
       const messageObj = this.createMessage(fileUrl);
 
       await ref
-      .child(pathToUpload)
-      .child(messageObj.id)
-      .update(messageObj);
+        .child(pathToUpload)
+        .child(messageObj.id)
+        .update(messageObj);
 
       this.setState({ uploadState: 'done' });
       this.props.isProgressBarVisible(0);
@@ -129,7 +130,7 @@ class MessageForm extends Component {
 
   sendMessage = async () => {
     const { getMessagesRef } = this.props;
-    const { message, channel } = this.state;
+    const { message, channel, user, typingRef } = this.state;
 
     if (message) {
       this.setState({ loading: true });
@@ -162,6 +163,11 @@ class MessageForm extends Component {
           .update(messageObj);
 
         this.setState({ loading: false, message: '', errors: [] });
+        typingRef
+          .child(channel.id)
+          .child(user.uid)
+          .remove();
+
       } catch (error) {
         this.setState({
           loading: false,
@@ -200,6 +206,20 @@ class MessageForm extends Component {
   handleKeyDown = event => {
     if (event.ctrlKey && event.keyCode === 13) {
       this.sendMessage();
+    }
+
+    const { message, typingRef, channel, user } = this.state;
+
+    if (message) {
+      typingRef
+        .child(channel.id)
+        .child(user.uid)
+        .set(user.displayName);
+    } else {
+      typingRef
+        .child(channel.id)
+        .child(user.uid)
+        .remove();
     }
   };
 

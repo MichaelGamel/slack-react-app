@@ -5,12 +5,15 @@ import MessageForm from './MessageForm';
 import firebase from '../../firebase';
 import Message from './Message';
 import Skeleton from './Skeleton';
+import Typing from './Typing';
 
 class Messages extends Component {
   state = {
     privateChannel: this.props.isPrivateChannel,
     messagesRef: firebase.database().ref('messages'),
     privateMessagesRef: firebase.database().ref('privateMessages'),
+    typingRef: firebase.database().ref('typing'),
+    connectedRef: firebase.database().ref('.info/connected'),
     channel: this.props.currentChannel,
     user: this.props.currentUser,
     messages: [],
@@ -19,7 +22,8 @@ class Messages extends Component {
     numberUniqueUsers: '',
     searchTerm: '',
     searchLoading: false,
-    searchResults: []
+    searchResults: [],
+    typingUsers: []
   };
 
   componentDidMount() {
@@ -46,6 +50,46 @@ class Messages extends Component {
   };
 
   addListeners = channelId => {
+    this.addMessageListener(channelId);
+    this.addTypingListener(channelId);
+  };
+
+  addTypingListener = channelId => {
+    let typingUsers = [];
+    this.state.typingRef.child(channelId).on('child_added', snap => {
+      if (snap.key !== this.state.user.uid) {
+        typingUsers = typingUsers.concat({
+          id: snap.key,
+          name: snap.val()
+        });
+        this.setState({ typingUsers });
+      }
+    });
+
+    this.state.typingRef.child(channelId).on('child_removed', snap => {
+      const index = typingUsers.findIndex(user => user.id === snap.key);
+      if (index !== -1) {
+        typingUsers = typingUsers.filter(user => user.id !== snap.key);
+        this.setState({ typingUsers });
+      }
+    });
+
+    this.state.connectedRef.on('value', snap => {
+      if (snap.val() === true) {
+        this.state.typingRef
+          .child(channelId)
+          .child(this.state.user.uid)
+          .onDisconnect()
+          .remove(err => {
+            if (err !== null) {
+              console.error(err);
+            }
+          });
+      }
+    });
+  };
+
+  addMessageListener = channelId => {
     let loadedMessages = [];
     const ref = this.getMessagesRef();
     let data;
@@ -88,16 +132,21 @@ class Messages extends Component {
   };
 
   handleRemoveLinkMetadata = async (message, data) => {
-
     const { channel } = this.state;
-    const newMessage = {...message};
+    const newMessage = { ...message };
     if (newMessage.metadata.length > 1) {
-      newMessage.metadata.splice(newMessage.metadata.findIndex(meta => meta.url === data.url), 1);
+      newMessage.metadata.splice(
+        newMessage.metadata.findIndex(meta => meta.url === data.url),
+        1
+      );
     } else {
       delete newMessage.metadata;
     }
     const ref = this.getMessagesRef();
-    await ref.child(channel.id).child(message.id).set(newMessage);
+    await ref
+      .child(channel.id)
+      .child(message.id)
+      .set(newMessage);
   };
 
   countUniqueUsers = messages => {
@@ -142,6 +191,17 @@ class Messages extends Component {
       : '';
   };
 
+  displayTypingUsers = users =>
+    users.length > 0 &&
+    users.map(user => (
+      <div
+        key={user.id}
+        style={{ display: 'flex', alignItems: 'center', marginBottom: '0.2em' }}
+      >
+        <span className="user__typing">{user.name} is typing</span> <Typing />
+      </div>
+    ));
+
   displayMessageSkeleton = loading =>
     loading ? (
       <React.Fragment>
@@ -163,7 +223,8 @@ class Messages extends Component {
       searchResults,
       searchLoading,
       privateChannel,
-      messagesLoading
+      messagesLoading,
+      typingUsers
     } = this.state;
     return (
       <React.Fragment>
@@ -182,6 +243,7 @@ class Messages extends Component {
             {searchTerm
               ? this.displayMessages(searchResults)
               : this.displayMessages(messages)}
+            {this.displayTypingUsers(typingUsers)}
             <div ref={node => (this.messagesEnd = node)} />
           </Comment.Group>
         </Segment>
