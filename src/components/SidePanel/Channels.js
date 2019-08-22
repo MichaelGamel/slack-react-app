@@ -211,7 +211,7 @@ class Channels extends Component {
           {this.displayChannels(channels)}
         </Menu.Menu>
 
-        <Modal basic open={modal} onClose={this.closeModal}>
+        <Modal open={modal} onClose={this.closeModal}>
           <Modal.Header>Add a Channel</Modal.Header>
           <Modal.Content>
             <Form onSubmit={this.handleSubmit}>
@@ -235,10 +235,10 @@ class Channels extends Component {
             </Form>
           </Modal.Content>
           <Modal.Actions>
-            <Button onClick={this.handleSubmit} color="green" inverted>
+            <Button onClick={this.handleSubmit} color="green">
               <Icon name="checkmark" /> Add
             </Button>
-            <Button onClick={this.closeModal} color="red" inverted>
+            <Button onClick={this.closeModal} color="red">
               <Icon name="remove" /> Cancel
             </Button>
           </Modal.Actions>

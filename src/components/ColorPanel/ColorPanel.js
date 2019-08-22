@@ -101,10 +101,10 @@ class ColorPanel extends Component {
         <Divider />
         <Button icon="add" size="small" color="blue" onClick={this.openModal} />
         {this.displayUserColors(userColors)}
-        <Modal basic open={modal} onClose={this.closeModal}>
+        <Modal open={modal} onClose={this.closeModal}>
           <Modal.Header>Choose App Colors</Modal.Header>
           <Modal.Content>
-            <Segment inverted>
+            <Segment>
               <Label content="Primary Color" />
               <SliderPicker
                 color={primary}
@@ -112,7 +112,7 @@ class ColorPanel extends Component {
               />
             </Segment>
 
-            <Segment inverted>
+            <Segment>
               <Label content="Secondry Color" />
               <SliderPicker
                 color={secondary}
@@ -121,10 +121,10 @@ class ColorPanel extends Component {
             </Segment>
           </Modal.Content>
           <Modal.Actions>
-            <Button color="green" inverted onClick={this.handleSaveColors}>
+            <Button color="green" onClick={this.handleSaveColors}>
               <Icon name="checkmark" /> Save Colors
             </Button>
-            <Button color="red" inverted onClick={this.closeModal}>
+            <Button color="red" onClick={this.closeModal}>
               <Icon name="remove" /> Cancel
             </Button>
           </Modal.Actions>

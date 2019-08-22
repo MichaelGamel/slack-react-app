@@ -140,7 +140,7 @@ class UserPanel extends Component {
             </Header>
           </Grid.Row>
           {/* User Dropdown */}
-          <Modal basic open={modal} onClose={this.closeModal}>
+          <Modal open={modal} onClose={this.closeModal}>
             <Modal.Header>Change Avatar</Modal.Header>
             <Modal.Content>
               <Input
@@ -181,16 +181,15 @@ class UserPanel extends Component {
               {croppedImage && (
                 <Button
                   color="green"
-                  inverted
                   onClick={this.uploadCroppedImage}
                 >
                   <Icon name="save" /> Change Avatar
                 </Button>
               )}
-              <Button color="green" inverted onClick={this.handleCropImage}>
+              <Button color="green" onClick={this.handleCropImage}>
                 <Icon name="image" /> Preview
               </Button>
-              <Button color="red" inverted onClick={this.closeModal}>
+              <Button color="red" onClick={this.closeModal}>
                 <Icon name="remove" /> Cancel
               </Button>
             </Modal.Actions>

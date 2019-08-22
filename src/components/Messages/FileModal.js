@@ -36,7 +36,7 @@ class FileModal extends Component {
   render() {
     const { modal, closeModal } = this.props;
     return (
-      <Modal basic open={modal} onClose={closeModal}>
+      <Modal open={modal} onClose={closeModal}>
         <Modal.Header>Select an image file</Modal.Header>
         <Modal.Content>
           <Input
@@ -48,10 +48,10 @@ class FileModal extends Component {
           />
         </Modal.Content>
         <Modal.Actions>
-          <Button color="green" inverted onClick={this.sendFile}>
+          <Button color="green" onClick={this.sendFile}>
             <Icon name="checkmark" /> Send
           </Button>
-          <Button color="red" inverted onClick={closeModal}>
+          <Button color="red" onClick={closeModal}>
             <Icon name="remove" /> Cancle
           </Button>
         </Modal.Actions>
