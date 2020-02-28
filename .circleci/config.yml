@@ -1,6 +1,7 @@
 version: 2 # use CircleCI 2.0
 jobs:
   build:
+    working_directory: ~/repo
     docker:
       - image: circleci/node:10
     steps:
@@ -25,15 +26,13 @@ jobs:
           # Runs jest with "--maxWorkers=2" argument to avoid OOM issues
           command: npm run build # replace with `yarn test` if using yarn
   deploy:
-    docker: # Specify executor for running deploy job
-      - image: circleci/node:10
+    machine:
+      enabled: true
+    working_directory: ~/repo
     steps:
-      - run: # Install the AWS CLI if it is not already included in the docker image
-          name: Install awscli 
-          command: sudo pip install awscli
-      - run: # Deploy to S3 using the sync command
-          name: Deploy to S3
-          command: aws s3 sync . https://com.michael.morgan.s3.eu-west-2.amazonaws.com/
+       - run:
+          name: Deploy
+          command: 'aws s3 sync ./ s3://com.michael.morgan --region us-west-2'
 
 workflows:
   version: 2
