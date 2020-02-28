@@ -24,9 +24,25 @@ jobs:
           name: Run build
           # Runs jest with "--maxWorkers=2" argument to avoid OOM issues
           command: npm run build # replace with `yarn test` if using yarn
+  deploy:
+    docker: # Specify executor for running deploy job
+      - image: circleci/node:10
+    steps:
+      - run: # Install the AWS CLI if it is not already included in the docker image
+          name: Install awscli 
+          command: sudo pip install awscli
+      - run: # Deploy to S3 using the sync command
+          name: Deploy to S3
+          command: aws s3 sync . https://com.michael.morgan.s3.eu-west-2.amazonaws.com/
 
 workflows:
   version: 2
-  Build and Test:
+  build-deploy:
     jobs:
       - build
+      - deploy:
+        requires:
+          - build
+        filters:
+          branches:
+            only: master # Only deploys when the commit is on the Master branch
