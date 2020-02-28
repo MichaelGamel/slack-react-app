@@ -21,7 +21,7 @@ jobs:
             - "node_modules"
 
       - run:
-          name: Run tests
+          name: Run build
           # Runs jest with "--maxWorkers=2" argument to avoid OOM issues
           command: npm run build # replace with `yarn test` if using yarn
 
