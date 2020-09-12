@@ -14,7 +14,7 @@
     "firebase-admin": "~7.0.0",
     "firebase-functions": "^2.2.0",
     "get-urls": "^9.1.0",
-    "node-fetch": "^2.6.0"
+    "node-fetch": "^2.6.1"
   },
   "engines": {
     "node": "8"
